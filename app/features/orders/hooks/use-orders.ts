@@ -1,12 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../../../services/api-client";
+
+import { queryKeys } from "../../../services/query-keys";
+import { orderService } from "../services/order.service";
 
 export function useOrders() {
     return useQuery({
-        queryKey: ["orders"],
-        queryFn: async () => {
-            const { data } = await api.get("/orders");
-            return data;
-        },
+        queryKey: queryKeys.orders.all,
+        queryFn: orderService.getOrders,
     });
 }

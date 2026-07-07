@@ -1,32 +1,53 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Eye, Filter } from "lucide-react";
+import dynamic from "next/dynamic";
+import { useCallback, useMemo, useState } from "react";
+import { Filter } from "lucide-react";
+
+import { DataTable } from "../../../components/ui/data-table";
+import { LoadingState } from "../../../components/ui/loading-state";
+import { ErrorState } from "../../../components/ui/error-state";
 
 import { useOrders } from "../hooks/use-orders";
-
-import { OrderStatusBadge } from "./order-status-badge";
-import { OrderDetailsDrawer } from "./order-details-drawer";
 import { OrderFilters } from "./order-filters";
 import { OrderEmptyState } from "./order-empty-state";
+import { OrderRow } from "./order-row";
 
-import { Pagination } from "../../../components/ui/pagination";
 import { Order } from "../types/order.types";
 
+import { useDebounce } from "../../../hooks/use-debounce";
+import { useTableState } from "../../../hooks/use-table-state";
+
+const OrderDetailsDrawer = dynamic(
+    () =>
+        import("./order-details-drawer").then(
+            (mod) => mod.OrderDetailsDrawer
+        ),
+    {
+        loading: () => (
+            <div className="fixed inset-0 z-50 bg-black/30" />
+        ),
+    }
+);
+
 export function OrderTable() {
-    const [search, setSearch] = useState("");
+    const {
+        search,
+        setSearch,
+        currentPage,
+        setCurrentPage,
+        openFilters,
+        setOpenFilters,
+    } = useTableState();
 
     const [openDrawer, setOpenDrawer] =
-        useState(false);
-
-    const [openFilters, setOpenFilters] =
         useState(false);
 
     const [selectedOrder, setSelectedOrder] =
         useState<Order | null>(null);
 
-    const [currentPage, setCurrentPage] =
-        useState(1);
+    const debouncedSearch =
+        useDebounce(search, 500);
 
     const ITEMS_PER_PAGE = 5;
 
@@ -36,44 +57,55 @@ export function OrderTable() {
         error,
     } = useOrders();
 
+    const handleViewOrder = useCallback(
+        (order: Order) => {
+            setSelectedOrder(order);
+            setOpenDrawer(true);
+        },
+        []
+    );
+
     const filteredOrders = useMemo(() => {
         return orders.filter(
             (order: Order) =>
                 order.id
                     .toLowerCase()
-                    .includes(search.toLowerCase()) ||
+                    .includes(
+                        debouncedSearch.toLowerCase()
+                    ) ||
                 order.customer
                     .toLowerCase()
-                    .includes(search.toLowerCase())
+                    .includes(
+                        debouncedSearch.toLowerCase()
+                    )
         );
-    }, [orders, search]);
+    }, [orders, debouncedSearch]);
 
     const totalPages = Math.ceil(
         filteredOrders.length / ITEMS_PER_PAGE
     );
 
-    const paginatedOrders =
-        filteredOrders.slice(
-            (currentPage - 1) * ITEMS_PER_PAGE,
-            currentPage * ITEMS_PER_PAGE
-        );
+    const paginatedOrders = useMemo(
+        () =>
+            filteredOrders.slice(
+                (currentPage - 1) *
+                ITEMS_PER_PAGE,
+                currentPage *
+                ITEMS_PER_PAGE
+            ),
+        [
+            filteredOrders,
+            currentPage,
+        ]
+    );
 
     if (isLoading) {
-        return (
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
-                <div className="animate-pulse space-y-4">
-                    <div className="h-10 w-64 rounded bg-slate-800" />
-                    <div className="h-72 rounded bg-slate-800" />
-                </div>
-            </div>
-        );
+        return <LoadingState />;
     }
 
     if (error) {
         return (
-            <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6 text-red-400">
-                Failed to load orders
-            </div>
+            <ErrorState message="Failed to load orders" />
         );
     }
 
@@ -101,7 +133,9 @@ export function OrderTable() {
                 <input
                     value={search}
                     onChange={(e) =>
-                        setSearch(e.target.value)
+                        setSearch(
+                            e.target.value
+                        )
                     }
                     placeholder="Search orders..."
                     className="
@@ -115,7 +149,10 @@ export function OrderTable() {
                     px-4
                     text-white
                     outline-none
+                    transition
                     focus:border-blue-500
+                    focus:ring-2
+                    focus:ring-blue-500/30
                     "
                 />
 
@@ -146,178 +183,60 @@ export function OrderTable() {
             {filteredOrders.length === 0 ? (
                 <OrderEmptyState />
             ) : (
-                <>
-                    <div className="overflow-x-auto">
-                        <table className="w-full min-w-[900px]">
-                            <thead>
-                                <tr className="border-b border-slate-800">
-                                    <th className="pb-4 text-left text-slate-400">
-                                        Order ID
-                                    </th>
+                <DataTable
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={
+                        setCurrentPage
+                    }
+                    columns={
+                        <>
+                            <th className="pb-4 text-left text-slate-400">
+                                Order ID
+                            </th>
 
-                                    <th className="pb-4 text-left text-slate-400">
-                                        Customer
-                                    </th>
+                            <th className="pb-4 text-left text-slate-400">
+                                Customer
+                            </th>
 
-                                    <th className="pb-4 text-left text-slate-400">
-                                        Date
-                                    </th>
+                            <th className="pb-4 text-left text-slate-400">
+                                Date
+                            </th>
 
-                                    <th className="pb-4 text-left text-slate-400">
-                                        Items
-                                    </th>
+                            <th className="pb-4 text-left text-slate-400">
+                                Items
+                            </th>
 
-                                    <th className="pb-4 text-left text-slate-400">
-                                        Total
-                                    </th>
+                            <th className="pb-4 text-left text-slate-400">
+                                Total
+                            </th>
 
-                                    <th className="pb-4 text-left text-slate-400">
-                                        Payment
-                                    </th>
+                            <th className="pb-4 text-left text-slate-400">
+                                Payment
+                            </th>
 
-                                    <th className="pb-4 text-left text-slate-400">
-                                        Status
-                                    </th>
+                            <th className="pb-4 text-left text-slate-400">
+                                Status
+                            </th>
 
-                                    <th className="pb-4 text-right text-slate-400">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {paginatedOrders.map(
-                                    (order: Order) => (
-                                        <tr
-                                            key={
-                                                order.id
-                                            }
-                                            className="
-                                            border-b
-                                            border-slate-800/50
-                                            "
-                                        >
-                                            <td className="py-4 font-medium text-white">
-                                                {
-                                                    order.id
-                                                }
-                                            </td>
-
-                                            <td className="py-4">
-                                                <div>
-                                                    <p className="text-white">
-                                                        {
-                                                            order.customer
-                                                        }
-                                                    </p>
-
-                                                    <p className="text-xs text-slate-500">
-                                                        {
-                                                            order.email
-                                                        }
-                                                    </p>
-                                                </div>
-                                            </td>
-
-                                            <td className="py-4 text-slate-300">
-                                                {
-                                                    order.createdAt
-                                                }
-                                            </td>
-
-                                            <td className="py-4 text-slate-300">
-                                                {
-                                                    order.items
-                                                }
-                                            </td>
-
-                                            <td className="py-4 text-slate-300">
-                                                $
-                                                {
-                                                    order.total
-                                                }
-                                            </td>
-
-                                            <td className="py-4">
-                                                <span
-                                                    className={`
-                                                    rounded-full
-                                                    px-3
-                                                    py-1
-                                                    text-xs
-                                                    ${order.paymentStatus ===
-                                                            "Paid"
-                                                            ? "bg-green-500/10 text-green-400"
-                                                            : "bg-yellow-500/10 text-yellow-400"
-                                                        }
-                                                    `}
-                                                >
-                                                    {
-                                                        order.paymentStatus
-                                                    }
-                                                </span>
-                                            </td>
-
-                                            <td className="py-4">
-                                                <OrderStatusBadge
-                                                    status={
-                                                        order.status
-                                                    }
-                                                />
-                                            </td>
-
-                                            <td className="py-4">
-                                                <div className="flex justify-end">
-                                                    <button
-                                                        onClick={() => {
-                                                            setSelectedOrder(
-                                                                order
-                                                            );
-                                                            setOpenDrawer(
-                                                                true
-                                                            );
-                                                        }}
-                                                        className="
-                                                        flex
-                                                        items-center
-                                                        gap-2
-                                                        rounded-lg
-                                                        border
-                                                        border-slate-800
-                                                        px-3
-                                                        py-2
-                                                        text-slate-300
-                                                        transition-colors
-                                                        hover:border-blue-500
-                                                        hover:text-white
-                                                        "
-                                                    >
-                                                        <Eye size={15} />
-                                                        View
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div className="mt-6">
-                        <Pagination
-                            currentPage={
-                                currentPage
-                            }
-                            totalPages={
-                                totalPages
-                            }
-                            onPageChange={
-                                setCurrentPage
-                            }
-                        />
-                    </div>
-                </>
+                            <th className="pb-4 text-right text-slate-400">
+                                Actions
+                            </th>
+                        </>
+                    }
+                >
+                    {paginatedOrders.map(
+                        (order) => (
+                            <OrderRow
+                                key={order.id}
+                                order={order}
+                                onView={
+                                    handleViewOrder
+                                }
+                            />
+                        )
+                    )}
+                </DataTable>
             )}
 
             <OrderDetailsDrawer
