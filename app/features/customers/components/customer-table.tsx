@@ -102,7 +102,7 @@ export function CustomerTable() {
             ) : (
                 <>
                     <div className="overflow-x-auto">
-                        <table className="w-full min-w-[900px]">
+                        <table className="w-full min-w-225">
                             <thead>
                                 <tr className="border-b border-slate-800">
                                     <th className="pb-4 text-left text-slate-400">
