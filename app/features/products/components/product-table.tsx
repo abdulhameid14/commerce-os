@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 
 import { AppButton } from "../../../components/ui/app-button";
-import { useProducts } from "./../hooks/use-products";
 import { Pagination } from "../../../components/ui/pagination";
 
 import { AddProductModal } from "./add-product-modal";
@@ -17,27 +16,11 @@ import { EditProductModal } from "./edit-product-modal";
 import { DeleteProductModal } from "./delete-product-modal";
 import { EmptyState } from "./empty-state";
 
-const products = [
-    {
-        id: "1",
-        name: "iPhone 17 Pro",
-        sku: "IP17P",
-        category: "Phones",
-        price: 1200,
-        stock: 15,
-        status: "active",
-    },
+import { useProducts } from "../hooks/use-products";
+import { useDeleteProduct } from "../hooks/use-delete-product";
 
-    {
-        id: "2",
-        name: "MacBook Pro",
-        sku: "MBP",
-        category: "Laptops",
-        price: 2500,
-        stock: 8,
-        status: "active",
-    },
-];
+import { LoadingState } from "../../../components/ui/loading-state";
+import { ErrorState } from "../../../components/ui/error-state";
 
 export function ProductTable() {
     const [search, setSearch] =
@@ -57,6 +40,25 @@ export function ProductTable() {
 
     const [currentPage, setCurrentPage] =
         useState(1);
+
+    const {
+        data: products = [],
+        isLoading,
+        error,
+    } = useProducts();
+
+    const deleteProductMutation =
+        useDeleteProduct();
+
+    if (isLoading) {
+        return <LoadingState />;
+    }
+
+    if (error) {
+        return (
+            <ErrorState message="Failed to load products" />
+        );
+    }
 
     const filtered = products.filter(
         (product) =>
@@ -108,9 +110,7 @@ export function ProductTable() {
                 />
 
                 <AddProductModal
-                    open={
-                        openAddModal
-                    }
+                    open={openAddModal}
                     onClose={() =>
                         setOpenAddModal(
                             false
@@ -216,9 +216,7 @@ export function ProductTable() {
 
                     <tbody>
                         {currentProducts.map(
-                            (
-                                product
-                            ) => (
+                            (product) => (
                                 <tr
                                     key={
                                         product.id
@@ -261,16 +259,26 @@ export function ProductTable() {
 
                                     <td className="py-4">
                                         <span
-                                            className="
+                                            className={`
+                                            inline-flex
+                                            items-center
                                             rounded-full
-                                            bg-green-500/10
+                                            border
                                             px-3
                                             py-1
                                             text-xs
-                                            text-green-400
-                                            "
+                                            font-medium
+                                            
+                                            ${product.status ===
+                                                    "active"
+                                                    ? "border-green-500/20 bg-green-500/10 text-green-400"
+                                                    : "border-slate-700 bg-slate-700/30 text-slate-400"
+                                                }
+                                            `}
                                         >
-                                            Active
+                                            {
+                                                product.status
+                                            }
                                         </span>
                                     </td>
 
@@ -387,13 +395,21 @@ export function ProductTable() {
                     selectedProduct?.name
                 }
                 onDelete={() => {
-                    console.log(
-                        "Delete:",
-                        selectedProduct
-                    );
+                    if (
+                        !selectedProduct
+                    )
+                        return;
 
-                    setOpenDeleteModal(
-                        false
+                    deleteProductMutation.mutate(
+                        selectedProduct.id,
+                        {
+                            onSuccess:
+                                () => {
+                                    setOpenDeleteModal(
+                                        false
+                                    );
+                                },
+                        }
                     );
                 }}
             />

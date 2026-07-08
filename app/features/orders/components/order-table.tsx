@@ -67,7 +67,7 @@ export function OrderTable() {
 
     const filteredOrders = useMemo(() => {
         return orders.filter(
-            (order: Order) =>
+            (order) =>
                 order.id
                     .toLowerCase()
                     .includes(
@@ -82,7 +82,8 @@ export function OrderTable() {
     }, [orders, debouncedSearch]);
 
     const totalPages = Math.ceil(
-        filteredOrders.length / ITEMS_PER_PAGE
+        filteredOrders.length /
+        ITEMS_PER_PAGE
     );
 
     const paginatedOrders = useMemo(
@@ -112,16 +113,18 @@ export function OrderTable() {
     return (
         <div
             className="
-            rounded-2xl
+            rounded-3xl
             border
-            border-slate-800
-            bg-slate-900/40
+            border-slate-800/80
+            bg-slate-900/25
+            backdrop-blur-xl
             p-6
+            shadow-[0_20px_60px_rgba(0,0,0,0.35)]
             "
         >
             <div
                 className="
-                mb-6
+                mb-8
                 flex
                 flex-col
                 gap-4
@@ -130,31 +133,33 @@ export function OrderTable() {
                 md:justify-between
                 "
             >
-                <input
-                    value={search}
-                    onChange={(e) =>
-                        setSearch(
-                            e.target.value
-                        )
-                    }
-                    placeholder="Search orders..."
-                    className="
-                    h-11
-                    w-full
-                    md:w-80
-                    rounded-xl
-                    border
-                    border-slate-800
-                    bg-slate-950
-                    px-4
-                    text-white
-                    outline-none
-                    transition
-                    focus:border-blue-500
-                    focus:ring-2
-                    focus:ring-blue-500/30
-                    "
-                />
+                <div className="w-full max-w-md">
+                    <input
+                        value={search}
+                        onChange={(e) =>
+                            setSearch(
+                                e.target.value
+                            )
+                        }
+                        placeholder="Search orders..."
+                        className="
+                        h-12
+                        w-full
+                        rounded-xl
+                        border
+                        border-slate-700
+                        bg-slate-950/70
+                        px-4
+                        text-sm
+                        text-white
+                        outline-none
+                        transition-all
+                        focus:border-blue-500
+                        focus:ring-2
+                        focus:ring-blue-500/20
+                        "
+                    />
+                </div>
 
                 <button
                     onClick={() =>
@@ -166,11 +171,11 @@ export function OrderTable() {
                     gap-2
                     rounded-xl
                     border
-                    border-slate-800
+                    border-slate-700
                     px-4
-                    py-2.5
+                    py-3
                     text-slate-300
-                    transition-colors
+                    transition
                     hover:border-blue-500
                     hover:text-white
                     "
@@ -180,46 +185,51 @@ export function OrderTable() {
                 </button>
             </div>
 
-            {filteredOrders.length === 0 ? (
+            {filteredOrders.length ===
+                0 ? (
                 <OrderEmptyState />
             ) : (
                 <DataTable
-                    currentPage={currentPage}
-                    totalPages={totalPages}
+                    currentPage={
+                        currentPage
+                    }
+                    totalPages={
+                        totalPages
+                    }
                     onPageChange={
                         setCurrentPage
                     }
                     columns={
                         <>
-                            <th className="pb-4 text-left text-slate-400">
+                            <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                                 Order ID
                             </th>
 
-                            <th className="pb-4 text-left text-slate-400">
+                            <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                                 Customer
                             </th>
 
-                            <th className="pb-4 text-left text-slate-400">
+                            <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                                 Date
                             </th>
 
-                            <th className="pb-4 text-left text-slate-400">
+                            <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                                 Items
                             </th>
 
-                            <th className="pb-4 text-left text-slate-400">
+                            <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                                 Total
                             </th>
 
-                            <th className="pb-4 text-left text-slate-400">
+                            <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                                 Payment
                             </th>
 
-                            <th className="pb-4 text-left text-slate-400">
+                            <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                                 Status
                             </th>
 
-                            <th className="pb-4 text-right text-slate-400">
+                            <th className="px-4 py-4 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
                                 Actions
                             </th>
                         </>
@@ -228,7 +238,9 @@ export function OrderTable() {
                     {paginatedOrders.map(
                         (order) => (
                             <OrderRow
-                                key={order.id}
+                                key={
+                                    order.id
+                                }
                                 order={order}
                                 onView={
                                     handleViewOrder

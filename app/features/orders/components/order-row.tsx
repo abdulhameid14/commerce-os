@@ -16,45 +16,56 @@ function OrderRowComponent({
     onView,
 }: OrderRowProps) {
     return (
-        <tr className="border-b border-slate-800/50">
-            <td className="py-4 font-medium text-white">
+        <tr
+            className="
+    transition-colors
+    hover:bg-slate-800/20
+    "
+        >
+            <td className="px-6 py-4 font-medium text-white">
                 {order.id}
             </td>
 
-            <td className="py-4">
+            <td className="px-6 py-4">
                 <div>
-                    <p className="text-white">
+                    <p className="font-medium text-white">
                         {order.customer}
                     </p>
 
-                    <p className="text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-slate-500">
                         {order.email}
                     </p>
                 </div>
             </td>
 
-            <td className="py-4 text-slate-300">
+            <td className="px-6 py-4 text-slate-300">
                 {order.createdAt}
             </td>
 
-            <td className="py-4 text-slate-300">
+            <td className="px-6 py-4 text-slate-300">
                 {order.items}
             </td>
 
-            <td className="py-4 text-slate-300">
+            <td className="px-6 py-4 font-medium text-white">
                 ${order.total}
             </td>
 
-            <td className="py-4">
+            <td className="px-6 py-4">
                 <span
                     className={`
+                    inline-flex
+                    items-center
                     rounded-full
                     px-3
                     py-1
+
                     text-xs
-                    ${order.paymentStatus === "Paid"
-                            ? "bg-green-500/10 text-green-400"
-                            : "bg-yellow-500/10 text-yellow-400"
+                    font-medium
+
+                    ${order.paymentStatus ===
+                            "Paid"
+                            ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                            : "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
                         }
                     `}
                 >
@@ -62,35 +73,45 @@ function OrderRowComponent({
                 </span>
             </td>
 
-            <td className="py-4">
+            <td className="px-6 py-4">
                 <OrderStatusBadge
                     status={order.status}
                 />
             </td>
 
-            <td className="py-4">
-                <div className="flex justify-end">
-                    <button
-                        onClick={() => onView(order)}
-                        className="
-                        flex
-                        items-center
-                        gap-2
-                        rounded-lg
-                        border
-                        border-slate-800
-                        px-3
-                        py-2
-                        text-slate-300
-                        transition-colors
-                        hover:border-blue-500
-                        hover:text-white
-                        "
-                    >
-                        <Eye size={15} />
-                        View
-                    </button>
-                </div>
+            <td className="px-6 py-4 text-right">
+                <button
+                    onClick={() =>
+                        onView(order)
+                    }
+                    className="
+                    inline-flex
+                    items-center
+                    gap-2
+
+                    rounded-lg
+
+                    border
+                    border-slate-700
+
+                    px-4
+                    py-2
+
+                    text-sm
+                    font-medium
+
+                    text-slate-300
+
+                    transition-all
+
+                    hover:border-blue-500
+                    hover:bg-blue-500/10
+                    hover:text-white
+                    "
+                >
+                    <Eye size={15} />
+                    View
+                </button>
             </td>
         </tr>
     );

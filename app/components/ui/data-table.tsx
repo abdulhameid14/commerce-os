@@ -24,23 +24,51 @@ export function DataTable({
 }: DataTableProps) {
     return (
         <>
-            <div className="overflow-x-auto">
-                <table className="w-full min-w-225">
-                    <thead>
-                        <tr className="border-b border-slate-800">
-                            {columns}
-                        </tr>
-                    </thead>
+            <div
+                className="
+                overflow-hidden
+                rounded-2xl
+                border
+                border-slate-800
+                bg-slate-950/30
+                "
+            >
+                <div className="overflow-x-auto">
+                    <table
+                        className="
+                        w-full
+                        min-w-[900px]
+                        table-auto
+                        "
+                    >
+                        <thead>
+                            <tr
+                                className="
+                                bg-slate-950/80
+                                border-b
+                                border-slate-800
+                                "
+                            >
+                                {columns}
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        {children}
-                    </tbody>
-                </table>
+                        <tbody
+                            className="
+                            divide-y
+                            divide-slate-800/60
+                            "
+                        >
+                            {children}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {currentPage &&
                 totalPages &&
-                onPageChange && (
+                onPageChange &&
+                totalPages > 1 && (
                     <div className="mt-6">
                         <Pagination
                             currentPage={currentPage}
