@@ -17,24 +17,19 @@ export async function POST(
         );
     }
 
-    const response =
-        NextResponse.json({
-            user: {
-                id: "1",
-                name: "Admin User",
-                email,
-            },
-        });
+    const response = NextResponse.json({
+      user: {
+        id: "1",
+        fullName: "Admin User",
+        email,
+      },
+    });
 
-    response.cookies.set(
-        "token",
-        "mock-jwt-token",
-        {
-            httpOnly: true,
-            path: "/",
-            maxAge: 60 * 60 * 24,
-        }
-    );
+    response.cookies.set("session", "authenticated", {
+      httpOnly: true,
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    });
 
     return response;
 }
