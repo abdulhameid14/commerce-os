@@ -9,6 +9,7 @@ interface Props {
     onClose: () => void;
     onDelete: () => void;
     productName?: string;
+    isDeleting?: boolean;
 }
 
 export function DeleteProductModal({
@@ -16,6 +17,7 @@ export function DeleteProductModal({
     onClose,
     onDelete,
     productName,
+    isDeleting,
 }: Props) {
     if (!open) return null;
 
@@ -58,9 +60,12 @@ export function DeleteProductModal({
 
                     <AppButton
                         onClick={onDelete}
+                        disabled={isDeleting}
                         className="flex-1 bg-red-600 hover:bg-red-700"
                     >
-                        Delete
+                        {isDeleting
+                            ? "Deleting..."
+                            : "Delete"}
                     </AppButton>
                 </div>
             </div>

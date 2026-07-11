@@ -1,40 +1,11 @@
 "use client";
+import { useCustomerAnalytics } from "../hooks/use-customer-analytics";
 
-import {
-    DollarSign,
-    ShoppingBag,
-    Users,
-    TrendingUp,
-} from "lucide-react";
-
-const analytics = [
-    {
-        title: "Total Customers",
-        value: "2,847",
-        change: "+12.4%",
-        icon: Users,
-    },
-    {
-        title: "Revenue",
-        value: "$84,320",
-        change: "+18.2%",
-        icon: DollarSign,
-    },
-    {
-        title: "Orders",
-        value: "5,624",
-        change: "+9.1%",
-        icon: ShoppingBag,
-    },
-    {
-        title: "Growth Rate",
-        value: "24.8%",
-        change: "+3.5%",
-        icon: TrendingUp,
-    },
-];
 
 export function CustomerAnalytics() {
+    const {
+        data: analytics = [],
+    } = useCustomerAnalytics();
     return (
         <div
             className="

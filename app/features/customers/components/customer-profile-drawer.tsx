@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { Customer } from "../types/customer.types";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 
 import { CustomerActivityTimeline } from "./customer-activity-timeline";
 import { CustomerOrdersTab } from "./customer-orders-tab";
+import { useCustomerActivities } from "../hooks/use-customer-activities";
+import { useCustomerOrders } from "../hooks/use-customer-orders";
 
 interface CustomerProfileDrawerProps {
     open: boolean;
     onClose: () => void;
-    customer: any;
+    customer: Customer | null;
 }
 
 export function CustomerProfileDrawer({
@@ -24,49 +27,13 @@ export function CustomerProfileDrawer({
             "profile"
         );
 
-    const customerOrders = [
-        {
-            id: "#1024",
-            total: "$240",
-            status: "Delivered",
-            date: "Jun 20, 2026",
-        },
-        {
-            id: "#1025",
-            total: "$480",
-            status: "Processing",
-            date: "Jun 18, 2026",
-        },
-        {
-            id: "#1026",
-            total: "$190",
-            status: "Pending",
-            date: "Jun 12, 2026",
-        },
-    ];
+    const {
+        data: customerOrders = [],
+    } = useCustomerOrders(customer?.id);
 
-    const activities = [
-        {
-            id: "1",
-            title: "Placed Order #1025",
-            date: "Today",
-        },
-        {
-            id: "2",
-            title: "Updated Profile",
-            date: "Yesterday",
-        },
-        {
-            id: "3",
-            title: "Purchased iPhone 17 Pro",
-            date: "3 days ago",
-        },
-        {
-            id: "4",
-            title: "Joined Store",
-            date: "1 week ago",
-        },
-    ];
+    const {
+        data: activities = [],
+    } = useCustomerActivities(customer?.id);
 
     return (
         <AnimatePresence>

@@ -8,7 +8,7 @@ import {
 import { queryKeys } from "../../../services/query-keys";
 import { productService } from "../services/product.service";
 import { Product } from "../types/product.types";
-
+import toast from "react-hot-toast";
 interface UpdateProductParams {
     id: string;
     data: Partial<Product>;
@@ -29,10 +29,20 @@ export function useUpdateProduct() {
             ),
 
         onSuccess: () => {
+            toast.success(
+                "Product updated successfully"
+            );
+
             queryClient.invalidateQueries({
                 queryKey:
                     queryKeys.products.all,
             });
+        },
+
+        onError: () => {
+            toast.error(
+                "Failed to update product"
+            );
         },
     });
 }

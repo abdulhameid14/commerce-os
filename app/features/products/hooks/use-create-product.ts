@@ -8,7 +8,7 @@ import {
 import { queryKeys } from "../../../services/query-keys";
 import { productService } from "../services/product.service";
 import { Product } from "../types/product.types";
-
+import toast from "react-hot-toast";
 export function useCreateProduct() {
     const queryClient =
         useQueryClient();
@@ -22,10 +22,20 @@ export function useCreateProduct() {
             ),
 
         onSuccess: () => {
+            toast.success(
+                "Product created successfully"
+            );
+
             queryClient.invalidateQueries({
                 queryKey:
                     queryKeys.products.all,
             });
+        },
+
+        onError: () => {
+            toast.error(
+                "Failed to create product"
+            );
         },
     });
 }

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-
 import { X } from "lucide-react";
 
 import { AppButton } from "../../../components/ui/app-button";
-
+import { useCreateProduct } from "../hooks/use-create-product";
+import { productSchema } from "../schemas/product.schema";
 import {
     ProductForm,
     ProductFormValues,
@@ -16,20 +16,31 @@ interface Props {
     onClose: () => void;
 }
 
+const initialValues: ProductFormValues = {
+    name: "",
+    sku: "",
+    category: "",
+    price: 0,
+    stock: 0,
+    status: "active",
+    image: null,
+};
+
 export function AddProductModal({
     open,
     onClose,
 }: Props) {
     const [values, setValues] =
-        useState<ProductFormValues>({
-            name: "",
-            sku: "",
-            category: "",
-            price: 0,
-            stock: 0,
-            status: "active",
-            image: null,
-        });
+        useState<ProductFormValues>(
+            initialValues
+        );
+
+    const createProductMutation =
+        useCreateProduct();
+    const [errors, setErrors] =
+        useState<
+            Record<string, string>
+        >({});
 
     if (!open) return null;
 
@@ -44,8 +55,60 @@ export function AddProductModal({
     };
 
     const handleSave = () => {
-        console.log(values);
-        onClose();
+        const result =
+            productSchema.safeParse(
+                values
+            );
+
+        if (!result.success) {
+            const fieldErrors =
+                result.error.flatten()
+                    .fieldErrors;
+
+            setErrors({
+                name:
+                    fieldErrors.name?.[0] ||
+                    "",
+                sku:
+                    fieldErrors.sku?.[0] ||
+                    "",
+                category:
+                    fieldErrors.category?.[0] ||
+                    "",
+                price:
+                    fieldErrors.price?.[0] ||
+                    "",
+                stock:
+                    fieldErrors.stock?.[0] ||
+                    "",
+            });
+
+            return;
+        }
+
+        setErrors({});
+
+        createProductMutation.mutate(
+            {
+                id: crypto.randomUUID(),
+                ...result.data,
+            },
+            {
+                onSuccess: () => {
+                    setValues({
+                        name: "",
+                        sku: "",
+                        category: "",
+                        price: 0,
+                        stock: 0,
+                        status: "active",
+                        image: null,
+                    });
+
+                    onClose();
+                },
+            }
+        );
     };
 
     return (
@@ -60,29 +123,28 @@ export function AddProductModal({
                         onClick={onClose}
                     >
                         <X
-                            className="text-slate-400"
                             size={20}
+                            className="text-slate-400"
                         />
                     </button>
                 </div>
 
                 <ProductForm
                     values={values}
-                    onChange={
-                        handleChange
-                    }
+                    errors={errors}
+                    onChange={handleChange}
                 />
 
                 <div className="mt-6 flex justify-end gap-3">
                     <button
                         onClick={onClose}
                         className="
-                        rounded-xl
-                        border
-                        border-slate-700
-                        px-4
-                        py-2
-                        text-white
+                            rounded-xl
+                            border
+                            border-slate-700
+                            px-4
+                            py-2
+                            text-white
                         "
                     >
                         Cancel
@@ -92,9 +154,14 @@ export function AddProductModal({
                         onClick={
                             handleSave
                         }
+                        disabled={
+                            createProductMutation.isPending
+                        }
                         className="w-auto px-6"
                     >
-                        Save Product
+                        {createProductMutation.isPending
+                            ? "Saving..."
+                            : "Save Product"}
                     </AppButton>
                 </div>
             </div>

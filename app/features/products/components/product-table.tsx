@@ -7,10 +7,10 @@ import {
     Pencil,
     Trash2,
 } from "lucide-react";
+import Link from "next/link";
 
 import { AppButton } from "../../../components/ui/app-button";
 import { Pagination } from "../../../components/ui/pagination";
-
 import { AddProductModal } from "./add-product-modal";
 import { EditProductModal } from "./edit-product-modal";
 import { DeleteProductModal } from "./delete-product-modal";
@@ -21,6 +21,7 @@ import { useDeleteProduct } from "../hooks/use-delete-product";
 
 import { LoadingState } from "../../../components/ui/loading-state";
 import { ErrorState } from "../../../components/ui/error-state";
+import { Product } from "../types/product.types";
 
 export function ProductTable() {
     const [search, setSearch] =
@@ -36,7 +37,7 @@ export function ProductTable() {
         useState(false);
 
     const [selectedProduct, setSelectedProduct] =
-        useState<any>(null);
+        useState<Product | null>(null);
 
     const [currentPage, setCurrentPage] =
         useState(1);
@@ -226,10 +227,13 @@ export function ProductTable() {
                                     border-slate-800/50
                                     "
                                 >
-                                    <td className="py-4 text-white">
-                                        {
-                                            product.name
-                                        }
+                                    <td className="py-4">
+                                        <Link
+                                            href={`/products/${product.id}`}
+                                            className="text-white hover:text-primary"
+                                        >
+                                            {product.name}
+                                        </Link>
                                     </td>
 
                                     <td className="py-4 text-slate-300">
@@ -312,8 +316,10 @@ export function ProductTable() {
                                                 />
                                             </button>
 
+
                                             <button
                                                 onClick={() => {
+
                                                     setSelectedProduct(
                                                         product
                                                     );
@@ -383,32 +389,28 @@ export function ProductTable() {
             />
 
             <DeleteProductModal
-                open={
-                    openDeleteModal
-                }
+                open={openDeleteModal}
                 onClose={() =>
-                    setOpenDeleteModal(
-                        false
-                    )
+                    setOpenDeleteModal(false)
                 }
                 productName={
                     selectedProduct?.name
                 }
+                isDeleting={
+                    deleteProductMutation.isPending
+                }
                 onDelete={() => {
-                    if (
-                        !selectedProduct
-                    )
+                    if (!selectedProduct)
                         return;
 
                     deleteProductMutation.mutate(
                         selectedProduct.id,
                         {
-                            onSuccess:
-                                () => {
-                                    setOpenDeleteModal(
-                                        false
-                                    );
-                                },
+                            onSuccess: () => {
+                                setOpenDeleteModal(
+                                    false
+                                );
+                            },
                         }
                     );
                 }}

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import { Product } from "../types/product.types";
 
 import { AppButton } from "../../../components/ui/app-button";
 
@@ -9,11 +10,12 @@ import {
     ProductForm,
     ProductFormValues,
 } from "./product-form";
+import { useUpdateProduct } from "../hooks/use-update-product";
 
 interface Props {
     open: boolean;
     onClose: () => void;
-    product: ProductFormValues | null;
+    product: Product | null;
 }
 
 export function EditProductModal({
@@ -23,7 +25,7 @@ export function EditProductModal({
 }: Props) {
     const [values, setValues] =
         useState<ProductFormValues>(
-            product || {
+            {
                 name: "",
                 sku: "",
                 category: "",
@@ -33,7 +35,21 @@ export function EditProductModal({
                 image: null,
             }
         );
-
+    useEffect(() => {
+        if (product) {
+            setValues({
+                name: product.name,
+                sku: product.sku,
+                category: product.category,
+                price: product.price,
+                stock: product.stock,
+                status: product.status,
+                image: null,
+            });
+        }
+    }, [product]);
+    const updateProductMutation =
+        useUpdateProduct();
     if (!open) return null;
 
     const handleChange = (
@@ -46,8 +62,15 @@ export function EditProductModal({
         }));
     };
 
+
     const handleUpdate = () => {
-        console.log(values);
+        if (!product?.id) return;
+
+        updateProductMutation.mutate({
+            id: product.id,
+            data: values,
+        });
+
         onClose();
     };
 
@@ -79,9 +102,12 @@ export function EditProductModal({
 
                     <AppButton
                         onClick={handleUpdate}
+                        disabled={updateProductMutation.isPending}
                         className="w-auto px-6"
                     >
-                        Update Product
+                        {updateProductMutation.isPending
+                            ? "Updating..."
+                            : "Update Product"}
                     </AppButton>
                 </div>
             </div>

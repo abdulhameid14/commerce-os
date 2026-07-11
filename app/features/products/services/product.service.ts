@@ -1,76 +1,45 @@
+import { api } from "../../../services/api-client";
 import { Product } from "../types/product.types";
 
-const mockProducts: Product[] = [
-    {
-        id: "1",
-        name: "iPhone 17 Pro",
-        sku: "IP17P",
-        category: "Phones",
-        price: 1200,
-        stock: 15,
-        status: "active",
-    },
-
-    {
-        id: "2",
-        name: "MacBook Pro",
-        sku: "MBP",
-        category: "Laptops",
-        price: 2500,
-        stock: 8,
-        status: "active",
-    },
-];
-
 export const productService = {
-    async getProducts() {
-        return mockProducts;
+    async getProducts(): Promise<Product[]> {
+        const { data } =
+            await api.get("/products");
+
+        return data;
     },
 
     async createProduct(
         product: Product
     ) {
-        mockProducts.push(product);
+        const { data } =
+            await api.post(
+                "/products",
+                product
+            );
 
-        return product;
+        return data;
     },
 
     async updateProduct(
         id: string,
-        data: Partial<Product>
+        product: Partial<Product>
     ) {
-        const index =
-            mockProducts.findIndex(
-                (p) => p.id === id
+        const { data } =
+            await api.put(
+                `/products/${id}`,
+                product
             );
 
-        if (index === -1)
-            throw new Error(
-                "Product not found"
-            );
-
-        mockProducts[index] = {
-            ...mockProducts[index],
-            ...data,
-        };
-
-        return mockProducts[index];
+        return data;
     },
 
     async deleteProduct(
         id: string
     ) {
-        const index =
-            mockProducts.findIndex(
-                (p) => p.id === id
-            );
-
-        if (index === -1)
-            throw new Error(
-                "Product not found"
-            );
-
-        mockProducts.splice(index, 1);
+        await api.delete(
+            `/products/${id}`
+        );
 
         return true;
     },
