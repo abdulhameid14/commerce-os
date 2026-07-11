@@ -6,7 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { loginSchema } from "../schemas/login.schema";
 import type { LoginFormData } from "../types/auth.types";
-
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { AppInput } from "../../../components/ui/app-input";
 import { AppButton } from "../../../components/ui/app-button";
 import { SocialAuth } from "../../../components/ui/social-auth";
@@ -21,10 +22,52 @@ export function LoginForm() {
         resolver: zodResolver(loginSchema),
     });
 
-    const onSubmit = async (data: LoginFormData) => {
-        console.log(data);
-    };
+    const router = useRouter();
 
+    const onSubmit = async (
+        data: LoginFormData
+    ) => {
+        try {
+            const response =
+                await fetch(
+                    "/api/auth/login",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+                        },
+                        body: JSON.stringify(
+                            data
+                        ),
+                    }
+                );
+
+            const result =
+                await response.json();
+
+            if (!response.ok) {
+                toast.error(
+                    result.message ||
+                    "Login failed"
+                );
+
+                return;
+            }
+
+            toast.success(
+                "Login successful"
+            );
+
+            router.push(
+                "/dashboard"
+            );
+        } catch {
+            toast.error(
+                "Something went wrong"
+            );
+        }
+    };
     return (
         <motion.div
             variants={fadeUp}

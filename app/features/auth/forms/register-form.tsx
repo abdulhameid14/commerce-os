@@ -11,7 +11,8 @@ import { AppInput } from "../../../components/ui/app-input";
 import { AppButton } from "../../../components/ui/app-button";
 import { motion } from "framer-motion";
 import { fadeUp } from "../animations/auth.animation";
-
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 export function RegisterForm() {
     const {
         register,
@@ -24,10 +25,51 @@ export function RegisterForm() {
         resolver: zodResolver(registerSchema),
     });
 
+    const router = useRouter();
+
     const onSubmit = async (
         data: RegisterFormData
     ) => {
-        console.log(data);
+        try {
+            const response =
+                await fetch(
+                    "/api/auth/register",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+                        },
+                        body: JSON.stringify(
+                            data
+                        ),
+                    }
+                );
+
+            const result =
+                await response.json();
+
+            if (!response.ok) {
+                toast.error(
+                    result.message ||
+                    "Registration failed"
+                );
+
+                return;
+            }
+
+            toast.success(
+                "Account created successfully"
+            );
+
+            router.push(
+                "/login"
+            );
+        } catch {
+            toast.error(
+                "Something went wrong"
+            );
+        }
     };
 
     return (
