@@ -1,84 +1,63 @@
 "use client";
 
-import {
-    createContext,
-    useContext,
-    useEffect,
-    useState,
-} from "react";
+import { createContext, useContext, useState } from "react";
 
 import { User } from "../types/user.types";
 
 interface AuthContextType {
-    user: User | null;
-    loading: boolean;
-    login: (user: User) => void;
-    logout: () => void;
+  user: User | null;
+  loading: boolean;
+  login: (user: User) => void;
+  logout: () => void;
 }
 
-const AuthContext =
-    createContext<AuthContextType | null>(
-        null
-    );
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
-    const [user, setUser] =
-        useState<User | null>(null);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
 
-    const [loading, setLoading] =
-        useState(true);
+    const storedUser = localStorage.getItem("commerce-user");
 
-    useEffect(() => {
-        const storedUser =
-            localStorage.getItem(
-                "commerce-user"
-            );
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
-        if (storedUser) {
-            setUser(
-                JSON.parse(storedUser)
-            );
-        }
+  const loading = false;
 
-        setLoading(false);
-    }, []);
+  const login = (user: User) => {
+    localStorage.setItem("commerce-user", JSON.stringify(user));
 
-    const login = (user: User) => {
-        localStorage.setItem(
-            "commerce-user",
-            JSON.stringify(user)
-        );
+    setUser(user);
+  };
 
-        setUser(user);
-    };
+  const logout = async () => {
+    localStorage.removeItem("commerce-user");
 
-    const logout = () => {
-        localStorage.removeItem(
-            "commerce-user"
-        );
+    setUser(null);
 
-        document.cookie =
-            "session=; Max-Age=0; path=/";
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-        setUser(null);
-    };
-
-    return (
-        <AuthContext.Provider
-            value={{
-                user,
-                loading,
-                login,
-                logout,
-            }}
-        >
-            {children}
-        </AuthContext.Provider>
-    );
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
