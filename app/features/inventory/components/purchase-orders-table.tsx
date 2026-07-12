@@ -3,13 +3,13 @@
 import { useMemo, useState } from "react";
 import { Eye } from "lucide-react";
 
-import { mockPurchaseOrders } from "../data/mock-purchase-orders";
 
 import { Pagination } from "../../../components/ui/pagination";
 import { AppButton } from "../../../components/ui/app-button";
 
 import { CreatePurchaseOrderModal } from "./create-purchase-order-modal";
 import { PurchaseOrderDetails } from "./purchase-order-details";
+import { usePurchaseOrders } from "../hooks/use-purchase-orders";
 
 export function PurchaseOrdersTable() {
     const [search, setSearch] =
@@ -28,16 +28,17 @@ export function PurchaseOrdersTable() {
         useState<any>(null);
 
     const ITEMS_PER_PAGE = 5;
+    const {
+        data: purchaseOrders = [],
+    } = usePurchaseOrders();
 
     const filteredOrders =
         useMemo(() => {
-            return mockPurchaseOrders.filter(
+            return purchaseOrders.filter(
                 (order) =>
                     order.supplier
                         .toLowerCase()
-                        .includes(
-                            search.toLowerCase()
-                        )
+                        .includes(search.toLowerCase())
             );
         }, [search]);
 

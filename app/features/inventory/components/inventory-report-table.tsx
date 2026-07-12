@@ -5,9 +5,9 @@ import { useMemo, useState } from "react";
 import { Pagination } from "../../../components/ui/pagination";
 import { AppButton } from "../../../components/ui/app-button";
 
-import { mockInventoryReports } from "../data/mock-inventory-reports";
 
 import { InventoryExportModal } from "./inventory-export-modal";
+import { useInventoryReports } from "../hooks/use-inventory-reports";
 
 export function InventoryReportTable() {
     const [search, setSearch] =
@@ -20,18 +20,20 @@ export function InventoryReportTable() {
         useState(false);
 
     const ITEMS_PER_PAGE = 5;
+    const {
+        data: reports = [],
+    } = useInventoryReports();
 
     const filteredReports =
         useMemo(() => {
-            return mockInventoryReports.filter(
+            return reports.filter(
                 (report) =>
                     report.reportType
                         .toLowerCase()
-                        .includes(
-                            search.toLowerCase()
-                        )
+                        .includes(search.toLowerCase())
             );
         }, [search]);
+
 
     const totalPages = Math.ceil(
         filteredReports.length /

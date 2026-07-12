@@ -3,13 +3,13 @@
 import { useMemo, useState } from "react";
 import { Eye } from "lucide-react";
 
-import { mockSuppliers } from "../data/mock-suppliers";
 
 import { Pagination } from "../../../components/ui/pagination";
 import { AppButton } from "../../../components/ui/app-button";
 
 import { AddSupplierModal } from "./add-supplier-modal";
 import { SupplierDetailsDrawer } from "./supplier-details-drawer";
+import { useSuppliers } from "../hooks/use-suppliers";
 
 export function SuppliersTable() {
     const [search, setSearch] =
@@ -17,7 +17,9 @@ export function SuppliersTable() {
 
     const [currentPage, setCurrentPage] =
         useState(1);
-
+    const {
+        data: suppliers = [],
+    } = useSuppliers();
     const [openAddModal, setOpenAddModal] =
         useState(false);
 
@@ -31,7 +33,7 @@ export function SuppliersTable() {
 
     const filteredSuppliers =
         useMemo(() => {
-            return mockSuppliers.filter(
+            return suppliers.filter(
                 (supplier) =>
                     supplier.company
                         .toLowerCase()
@@ -44,6 +46,7 @@ export function SuppliersTable() {
                             search.toLowerCase()
                         )
             );
+
         }, [search]);
 
     const totalPages =
