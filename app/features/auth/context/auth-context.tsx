@@ -1,6 +1,11 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 import { User } from "../types/user.types";
 
@@ -8,41 +13,56 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (user: User) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext =
+  createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window === "undefined") {
-      return null;
+export function AuthProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [user, setUser] =
+    useState<User | null>(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  useEffect(() => {
+    const storedUser =
+      localStorage.getItem(
+        "commerce-user"
+      );
+
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
 
-    const storedUser = localStorage.getItem("commerce-user");
-
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
-
-  const loading = false;
+    setLoading(false);
+  }, []);
 
   const login = (user: User) => {
-    localStorage.setItem("commerce-user", JSON.stringify(user));
+    localStorage.setItem(
+      "commerce-user",
+      JSON.stringify(user)
+    );
 
     setUser(user);
   };
 
   const logout = async () => {
-    localStorage.removeItem("commerce-user");
-
-    setUser(null);
-
     try {
       await fetch("/api/auth/logout", {
         method: "POST",
       });
-    } catch (error) {
-      console.error(error);
+    } finally {
+      localStorage.removeItem(
+        "commerce-user"
+      );
+
+      setUser(null);
     }
   };
 
@@ -61,14 +81,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useAuth() {
-    const context =
-        useContext(AuthContext);
+  const context =
+    useContext(AuthContext);
 
-    if (!context) {
-        throw new Error(
-            "useAuth must be used within AuthProvider"
-        );
-    }
+  if (!context) {
+    throw new Error(
+      "useAuth must be used within AuthProvider"
+    );
+  }
 
-    return context;
+  return context;
 }

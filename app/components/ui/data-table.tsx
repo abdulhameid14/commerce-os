@@ -65,9 +65,10 @@ export function DataTable({
                 </div>
             </div>
 
-            {currentPage &&
-                totalPages &&
-                onPageChange &&
+            {
+                currentPage !== undefined &&
+                totalPages !== undefined &&
+                onPageChange !== undefined &&
                 totalPages > 1 && (
                     <div className="mt-6">
                         <Pagination
@@ -76,7 +77,8 @@ export function DataTable({
                             onPageChange={onPageChange}
                         />
                     </div>
-                )}
+                )
+            }
         </>
     );
 }

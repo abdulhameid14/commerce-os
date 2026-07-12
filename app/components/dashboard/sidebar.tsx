@@ -16,6 +16,7 @@ import {
     Megaphone,
     X,
 } from "lucide-react";
+import { useAuth } from "@/app/features/auth/context/auth-context";
 
 const items = [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -31,6 +32,14 @@ const items = [
 
 function SidebarContent() {
     const pathname = usePathname();
+    const {
+        user,
+        loading,
+        logout,
+    } = useAuth();
+    if (loading) {
+        return null;
+    }
 
     return (
         <>
@@ -73,6 +82,31 @@ function SidebarContent() {
                     );
                 })}
             </nav>
+            <div className="border-t border-slate-900 p-4">
+                <p className="text-sm text-white">
+                    {user?.fullName}
+                </p>
+
+                <p className="text-xs text-slate-500">
+                    {user?.email}
+                </p>
+
+                <button
+                    onClick={logout}
+                    className="
+                            mt-3
+                            w-full
+                            rounded-lg
+                            bg-red-500/10
+                            py-2
+                            text-sm
+                            text-red-400
+                        "
+                >
+                    Logout
+                </button>
+            </div>
+
         </>
     );
 }
