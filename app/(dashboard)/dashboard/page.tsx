@@ -3,35 +3,29 @@
 import { motion } from "framer-motion";
 
 import { StatCard } from "../../components/dashboard/stat-card";
-import { RevenueChart } from "@/app/features/dashboard/revenue-chart";
-import { RecentOrders } from "@/app/features/dashboard/recent-orders";
-import { TopProducts } from "@/app/features/dashboard/top-products";
-import { QuickActions } from "@/app/features/dashboard/quick-actions";
+import { RevenueChart } from "@/app/features/dashboard/components/revenue-chart";
+import { RecentOrders } from "@/app/features/dashboard/components/recent-orders";
+import { TopProducts } from "@/app/features/dashboard/components/top-products";
+import { QuickActions } from "@/app/features/dashboard/components/quick-actions";
+import { useDashboard } from "@/app/features/dashboard/hooks/use-dashboard";
+import { LoadingState } from "@/app/components/ui/loading-state";
+import { ErrorState } from "@/app/components/ui/error-state";
 
 export default function DashboardPage() {
-    const stats = [
-        {
-            title: "Revenue",
-            value: "$24,580",
-            trend: "+12.3%",
-        },
-        {
-            title: "Orders",
-            value: "1,248",
-            trend: "+8.1%",
-        },
-        {
-            title: "Products",
-            value: "324",
-            trend: "+4.2%",
-        },
-        {
-            title: "Customers",
-            value: "842",
-            trend: "+15.6%",
-        },
-    ];
+    const {
+        data,
+        isLoading,
+        error,
+    } = useDashboard();
+    if (isLoading) {
+        return <LoadingState />;
+    }
 
+    if (error) {
+        return (
+            <ErrorState message="Failed to load dashboard" />
+        );
+    }
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -50,7 +44,7 @@ export default function DashboardPage() {
 
             {/* Stats */}
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                {stats.map((card, index) => (
+                {data?.stats.map((card: any, index: number) => (
                     <motion.div
                         key={card.title}
                         initial={{ opacity: 0, y: 15 }}
@@ -69,16 +63,22 @@ export default function DashboardPage() {
             </div>
 
             {/* Revenue Chart */}
-            <RevenueChart />
+            <RevenueChart
+                data={data?.revenue ?? []}
+            />
 
             {/* Bottom Section */}
             <div className="grid gap-6 xl:grid-cols-3">
                 <div className="xl:col-span-2">
-                    <RecentOrders />
+                    <RecentOrders
+                        orders={data?.recentOrders ?? []}
+                    />
                 </div>
 
                 <div>
-                    <TopProducts />
+                    <TopProducts
+                        products={data?.topProducts ?? []}
+                    />
                 </div>
             </div>
 

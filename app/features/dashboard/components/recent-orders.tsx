@@ -1,36 +1,26 @@
 "use client";
 
-const orders = [
-    {
-        id: "#1024",
-        customer: "John Smith",
-        amount: "$240",
-        status: "Delivered",
-    },
+interface Order {
+    id: string;
+    customer: string;
+    amount: string;
+    status: string;
+}
 
-    {
-        id: "#1025",
-        customer: "Sarah",
-        amount: "$480",
-        status: "Processing",
-    },
+interface RecentOrdersProps {
+    orders: Order[];
+}
 
-    {
-        id: "#1026",
-        customer: "Michael",
-        amount: "$190",
-        status: "Pending",
-    },
-];
-
-export function RecentOrders() {
+export function RecentOrders({
+    orders,
+}: RecentOrdersProps) {
     return (
         <div
             className="
             rounded-2xl
             border
             border-slate-800
-           bg-slate-900/40
+            bg-slate-900/40
             p-6
             "
         >
@@ -46,11 +36,9 @@ export function RecentOrders() {
                         flex
                         items-center
                         justify-between
-
                         rounded-xl
                         border
                         border-slate-800
-
                         p-4
                         "
                     >

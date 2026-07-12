@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 
-import { useProducts } from "../hooks/use-products";
+import { useProduct } from "../hooks/use-product";
 
 import { LoadingState } from "../../../components/ui/loading-state";
 import { ErrorState } from "../../../components/ui/error-state";
@@ -10,11 +10,13 @@ import { ErrorState } from "../../../components/ui/error-state";
 export function ProductDetails() {
     const params = useParams();
 
+    const productId = params.id as string;
+
     const {
-        data: products = [],
+        data: product,
         isLoading,
         error,
-    } = useProducts();
+    } = useProduct(productId);
 
     if (isLoading) {
         return <LoadingState />;
@@ -25,10 +27,6 @@ export function ProductDetails() {
             <ErrorState message="Failed to load product" />
         );
     }
-
-    const product = products.find(
-        (p) => p.id === params.id
-    );
 
     if (!product) {
         return (

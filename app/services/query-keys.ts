@@ -12,7 +12,12 @@ export const queryKeys = {
     },
 
     inventory: {
-        all: ["inventory"] as const,
+        all: ["inventory"],
+        movements: ["inventory-movements"],
+        suppliers: ["inventory-suppliers"],
+        purchaseOrders: ["inventory-purchase-orders"],
+        reports: ["inventory-reports"],
+        warehouses: ["inventory-warehouses"],
     },
 
     marketing: {

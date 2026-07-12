@@ -1,30 +1,24 @@
 "use client";
 
-const products = [
-    {
-        name: "iPhone 17 Pro",
-        sales: 420,
-    },
+interface Product {
+    name: string;
+    sales: number;
+}
 
-    {
-        name: "MacBook Pro",
-        sales: 310,
-    },
+interface TopProductsProps {
+    products: Product[];
+}
 
-    {
-        name: "AirPods Pro",
-        sales: 270,
-    },
-];
-
-export function TopProducts() {
+export function TopProducts({
+    products,
+}: TopProductsProps) {
     return (
         <div
             className="
             rounded-2xl
             border
             border-slate-800
-           bg-slate-900/40
+            bg-slate-900/40
             p-6
             "
         >

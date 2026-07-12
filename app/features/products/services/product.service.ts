@@ -8,6 +8,14 @@ export const productService = {
 
         return data;
     },
+    async getProductById(
+        id: string
+    ): Promise<Product> {
+        const { data } =
+            await api.get(`/products/${id}`);
+
+        return data;
+    },
 
     async createProduct(
         product: Product

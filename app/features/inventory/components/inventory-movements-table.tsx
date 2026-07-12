@@ -1,8 +1,10 @@
 "use client";
 
-import { movements } from "../data/mock-movements";
-
+import { useInventoryMovements } from "../hooks/use-inventory-movements";
 export function InventoryMovementsTable() {
+    const {
+        data: movements = [],
+    } = useInventoryMovements();
     return (
         <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
             <h3 className="mb-5 text-lg font-semibold text-white">

@@ -7,17 +7,18 @@ import {
     Tooltip,
 } from "recharts";
 
-const data = [
-    { name: "Mon", revenue: 1200 },
-    { name: "Tue", revenue: 1800 },
-    { name: "Wed", revenue: 1400 },
-    { name: "Thu", revenue: 2600 },
-    { name: "Fri", revenue: 2200 },
-    { name: "Sat", revenue: 3200 },
-    { name: "Sun", revenue: 2800 },
-];
+interface RevenueItem {
+    name: string;
+    revenue: number;
+}
 
-export function RevenueChart() {
+interface RevenueChartProps {
+    data: RevenueItem[];
+}
+
+export function RevenueChart({
+    data,
+}: RevenueChartProps) {
     return (
         <div
             className="

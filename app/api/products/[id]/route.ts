@@ -1,6 +1,32 @@
 import { NextResponse } from "next/server";
 import { products } from "../_store";
+export async function GET(
+    request: Request,
+    {
+        params,
+    }: {
+        params: Promise<{ id: string }>;
+    }
+) {
+    const { id } = await params;
 
+    const product = products.find(
+        (product) => product.id === id
+    );
+
+    if (!product) {
+        return NextResponse.json(
+            {
+                message: "Product not found",
+            },
+            {
+                status: 404,
+            }
+        );
+    }
+
+    return NextResponse.json(product);
+}
 export async function DELETE(
     request: Request,
     {
