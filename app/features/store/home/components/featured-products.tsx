@@ -1,6 +1,8 @@
 import { Container } from "../../shared/container";
+import { useProducts } from "@/app/features/products/hooks/use-products";
 
 export function FeaturedProducts() {
+
     return (
         <section className="py-24">
             <Container>
