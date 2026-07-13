@@ -1,14 +1,13 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Customer } from "../types/customer.types";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-
 import { CustomerActivityTimeline } from "./customer-activity-timeline";
 import { CustomerOrdersTab } from "./customer-orders-tab";
 import { useCustomerActivities } from "../hooks/use-customer-activities";
 import { useCustomerOrders } from "../hooks/use-customer-orders";
-
+import { useUpdateCustomer } from "../hooks/use-update-customer";
 interface CustomerProfileDrawerProps {
     open: boolean;
     onClose: () => void;
@@ -31,6 +30,33 @@ export function CustomerProfileDrawer({
     const {
         data: activities = [],
     } = useCustomerActivities(customer?.id);
+    const [notes, setNotes] = useState("");
+
+    useEffect(() => {
+        if (customer) {
+            setNotes(customer.notes || "");
+        }
+    }, [customer]);
+    const handleSaveNotes = () => {
+        if (!customer) return;
+
+        updateCustomer.mutate({
+            id: customer.id,
+            notes,
+        });
+    };
+    const handleStatusChange = (
+        status: "active" | "inactive"
+    ) => {
+        if (!customer) return;
+
+        updateCustomer.mutate({
+            id: customer.id,
+            status,
+        });
+    };
+    const updateCustomer =
+        useUpdateCustomer();
 
     return (
         <AnimatePresence>
@@ -120,6 +146,40 @@ export function CustomerProfileDrawer({
                                         <h3 className="mb-4 text-sm font-semibold text-white">
                                             Customer Information
                                         </h3>
+                                        <div>
+                                            <p className="text-xs text-slate-500">
+                                                Status
+                                            </p>
+
+                                            <select
+                                                value={customer.status}
+                                                onChange={(e) =>
+                                                    handleStatusChange(
+                                                        e.target.value as
+                                                        | "active"
+                                                        | "inactive"
+                                                    )
+                                                }
+                                                className="
+                                                    mt-1
+                                                    rounded-lg
+                                                    border
+                                                    border-slate-800
+                                                    bg-slate-950
+                                                    px-3
+                                                    py-2
+                                                    text-white
+                                                "
+                                            >
+                                                <option value="active">
+                                                    Active
+                                                </option>
+
+                                                <option value="inactive">
+                                                    Inactive
+                                                </option>
+                                            </select>
+                                        </div>
 
                                         {/* Tabs */}
                                         <div
@@ -139,14 +199,14 @@ export function CustomerProfileDrawer({
                                                     )
                                                 }
                                                 className={`
-                          flex-1
-                          rounded-lg
-                          px-4
-                          py-2
-                          text-sm
-                          transition-all
+                                                            flex-1
+                                                            rounded-lg
+                                                            px-4
+                                                            py-2
+                                                            text-sm
+                                                            transition-all
 
-                          ${activeTab ===
+                                                            ${activeTab ===
                                                         "profile"
                                                         ? "bg-blue-600 text-white"
                                                         : "text-slate-400"
@@ -266,22 +326,43 @@ export function CustomerProfileDrawer({
                                                 </h3>
 
                                                 <textarea
-                                                    rows={
-                                                        5
+                                                    rows={5}
+                                                    value={notes}
+                                                    onChange={(e) =>
+                                                        setNotes(e.target.value)
                                                     }
                                                     placeholder="Add customer notes..."
                                                     className="
-                            w-full
-                            rounded-xl
-                            border
-                            border-slate-800
-                            bg-slate-950
-                            p-4
-                            text-white
-                            outline-none
-                            focus:border-blue-500
-                          "
+                                                    w-full
+                                                    rounded-xl
+                                                    border
+                                                    border-slate-800
+                                                    bg-slate-950
+                                                    p-4
+                                                    text-white
+                                                    outline-none
+                                                    focus:border-blue-500
+                                                "
                                                 />
+                                                <button
+                                                    onClick={handleSaveNotes}
+                                                    disabled={updateCustomer.isPending}
+                                                    className="
+                                                    mt-4
+                                                    rounded-lg
+                                                    bg-blue-600
+                                                    px-4
+                                                    py-2
+                                                    text-sm
+                                                    text-white
+                                                    hover:bg-blue-700
+                                                    disabled:opacity-50
+                                                "
+                                                >
+                                                    {updateCustomer.isPending
+                                                        ? "Saving..."
+                                                        : "Save Notes"}
+                                                </button>
                                             </div>
                                         </>
                                     ) : (

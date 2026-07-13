@@ -6,4 +6,5 @@ export interface Customer {
     spent: number;
     status: "active" | "inactive";
     joinedAt: string;
+    notes?: string;
 }

@@ -38,8 +38,8 @@ export async function POST(
         });
 
     response.cookies.set(
-        "token",
-        "mock-jwt-token",
+        "session",
+        "authenticated",
         {
             httpOnly: true,
             path: "/",

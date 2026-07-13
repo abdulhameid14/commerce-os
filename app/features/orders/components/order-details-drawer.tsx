@@ -3,7 +3,7 @@
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Order } from "../types/order.types";
-
+import { useUpdateOrderStatus } from "../hooks/use-update-order-status";
 interface OrderDetailsDrawerProps {
     open: boolean;
     onClose: () => void;
@@ -15,6 +15,8 @@ export function OrderDetailsDrawer({
     onClose,
     order,
 }: OrderDetailsDrawerProps) {
+    const updateStatus =
+    useUpdateOrderStatus();
     return (
         <AnimatePresence>
             {open && (
@@ -149,6 +151,51 @@ export function OrderDetailsDrawer({
                                         </div>
                                     </div>
                                 </div>
+                                <div className="rounded-2xl border border-border-custom bg-card/40 p-5">
+    <h3 className="mb-4 text-sm font-semibold text-white">
+        Order Status
+    </h3>
+
+    <select
+        value={order.status}
+        onChange={(e) =>
+            updateStatus.mutate({
+                id: order.id,
+                status:
+                    e.target.value,
+            })
+        }
+        className="
+            w-full
+            rounded-lg
+            border
+            border-slate-800
+            bg-slate-950
+            p-3
+            text-white
+        "
+    >
+        <option value="Pending">
+            Pending
+        </option>
+
+        <option value="Processing">
+            Processing
+        </option>
+
+        <option value="Shipped">
+            Shipped
+        </option>
+
+        <option value="Delivered">
+            Delivered
+        </option>
+
+        <option value="Cancelled">
+            Cancelled
+        </option>
+    </select>
+</div>
                             </div>
                         )}
                     </motion.div>

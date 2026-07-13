@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
+import { useLogout } from "@/app/features/auth/hooks/use-logout";
 import {
     LayoutDashboard,
     Package,
@@ -35,8 +35,9 @@ function SidebarContent() {
     const {
         user,
         loading,
-        logout,
     } = useAuth();
+
+    const logout = useLogout();
     if (loading) {
         return null;
     }
