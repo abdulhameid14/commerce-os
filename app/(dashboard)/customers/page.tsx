@@ -1,7 +1,7 @@
 import { CustomerTable } from "../../features/customers/components/customer-table";
 import { CustomerSegments } from "../../features/customers/components/customer-segments";
 
-import { CustomerAnalytics } from "../../features/customers/components/customer-analytics";
+import { CustomerAnalytics } from "../../features/customers/components/customer-profile-analytics";
 export default function CustomersPage() {
     return (
         <div className="space-y-6">
