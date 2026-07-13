@@ -1,8 +1,6 @@
 "use client";
-
 import { useState } from "react";
 import { Customer } from "../types/customer.types";
-
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 
@@ -16,7 +14,6 @@ interface CustomerProfileDrawerProps {
     onClose: () => void;
     customer: Customer | null;
 }
-
 export function CustomerProfileDrawer({
     open,
     onClose,
@@ -56,7 +53,6 @@ export function CustomerProfileDrawer({
               backdrop-blur-sm
             "
                     />
-
                     <motion.div
                         initial={{
                             x: 500,

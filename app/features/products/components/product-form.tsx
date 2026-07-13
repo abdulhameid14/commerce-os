@@ -173,6 +173,7 @@ export function ProductForm({
                 <input
                     type="file"
                     accept="image/*"
+                    
 
                     onChange={(e) =>
                         onChange(
