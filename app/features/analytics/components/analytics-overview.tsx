@@ -1,11 +1,15 @@
 "use client";
 
-import { analyticsCards } from "../data/mock-analytics";
-
+import { useAnalytics } from "../hooks/useAnalytics";
 export function AnalyticsOverview() {
+    const { data = [], isLoading } = useAnalytics();
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
     return (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {analyticsCards.map((card) => (
+            {data.map((card) => (
                 <div
                     key={card.id}
                     className="
